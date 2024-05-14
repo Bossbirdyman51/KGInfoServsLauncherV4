@@ -5,9 +5,9 @@
   "description": "Conçus pour les serveurs KGInfoServs",
   "author": "Bossbirdyman",
   "license": "MIT",
-  "homepage": "https://kginfoservs.com",
+  "homepage": "https://github.com/Bossbirdyman51/KGInfoServsLauncherV4",
   "bugs": {
-    "url": "https://discord.gg/UxxdkDy"
+    "url": "https://github.com/Bossbirdyman51/KGInfoServsLauncherV4/issues"
   },
   "private": true,
   "main": "index.js",
