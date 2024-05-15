@@ -10,7 +10,7 @@
     "url": "https://github.com/Bossbirdyman51/KGInfoServsLauncherV4/issues"
   },
   "private": true,
-  "main": "index.js",
+  "main": "index.js", 
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder build",
