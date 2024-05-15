@@ -4,15 +4,15 @@
 title = "KGInfoServs Launcher"
 
 [ejs.landing]
-mediaGitHubURL = "https://github.com/dscalzi/HeliosLauncher"
+mediaGitHubURL = "https://github.com/Bossbirdyman51/KGInfoServsLauncherV4"
 mediaTwitterURL = "#"
 mediaInstagramURL = "#"
 mediaYouTubeURL = "#"
-mediaDiscordURL = "https://discord.gg/zNWUXdt"
+mediaDiscordURL = "https://discord.gg/UxxdkDy"
 
 [ejs.settings]
-sourceGithubLink = "https://github.com/dscalZi/HeliosLauncher"
-supportLink = "https://github.com/dscalZi/HeliosLauncher/issues"
+sourceGithubLink = "https://github.com/Bossbirdyman51/KGInfoServsLauncherV4"
+supportLink = "https://github.com/Bossbirdyman51/KGInfoServsLauncherV4/issues"
 
 [ejs.welcome]
 welcomeHeader = "Bienvenue sur KGInfoServs"
