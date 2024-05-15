@@ -112,7 +112,7 @@ stableRelease = "Version stable"
 versionText = "Version "
 sourceGithub = "Code source (GitHub)"
 support = "Assistance"
-devToolsConsole = "Console des outils de développement"
+devToolsConsole = ""
 releaseNotes = "Notes de version"
 changelog = "Journal des modifications"
 noReleaseNotes = "Pas de notes de version"
@@ -153,22 +153,22 @@ title = "Unknown Error During Login"
 desc = "An unknown error has occurred. Please see the console for details."
 
 [js.landing.launch]
-pleaseWait = "Please wait.."
+pleaseWait = "Merci de patienter..."
 failureTitle = "Error During Launch"
 failureText = "See console (CTRL + Shift + i) for more details."
 okay = "Okay"
 
 [js.landing.selectedAccount]
-noAccountSelected = "No Account Selected"
+noAccountSelected = "Aucun compte choisis"
 
 [js.landing.selectedServer]
-noSelection = "No Server Selected"
-loading = "Loading.."
+noSelection = "Aucun serveur selectionné"
+loading = "Chargement.."
 
 [js.landing.serverStatus]
-server = "SERVER"
-offline = "OFFLINE"
-players = "PLAYERS"
+server = "SERVEUR"
+offline = "Hors Ligne"
+players = "Joueurs"
 
 [js.landing.systemScan]
 checking = "Checking system info.."
@@ -197,14 +197,14 @@ unableToLoadDistributionIndex = "Could not load a copy of the distribution index
 pleaseWait = "Please wait.."
 errorDuringLaunchTitle = "Error During Launch"
 seeConsoleForDetails = "See console (CTRL + Shift + i) for more details."
-validatingFileIntegrity = "Validating file integrity.."
+validatingFileIntegrity = "Vérification des fichiers.."
 errorDuringFileVerificationTitle = "Error During File Verification"
-downloadingFiles = "Downloading files.."
-errorDuringFileDownloadTitle = "Error During File Download"
-preparingToLaunch = "Preparing to launch.."
-launchingGame = "Launching game.."
+downloadingFiles = "Téléchargement..."
+errorDuringFileDownloadTitle = "Erreur pendant le téléchargement"
+preparingToLaunch = "Préparation du lancement..."
+launchingGame = "Lancement du jeux..."
 launchWrapperNotDownloaded = "The main file, LaunchWrapper, failed to download properly. As a result, the game cannot launch.<br><br>To fix this issue, temporarily turn off your antivirus software and launch the game again.<br><br>If you have time, please <a href=\"https://github.com/Bossbirdyman51/KGInfoServsLauncherV4/issues\">submit an issue</a> and let us know what antivirus software you use. We'll contact them and try to straighten things out."
-doneEnjoyServer = "Done. Enjoy the server!"
+doneEnjoyServer = "Terminé !"
 checkConsoleForDetails = "Please check the console (CTRL + Shift + i) for more details."
 
 [js.landing.news]
@@ -267,17 +267,17 @@ availableOptions = "Available Options for Java {major} (HotSpot VM)"
 
 [js.settings.about]
 preReleaseTitle = "Pre-release"
-stableReleaseTitle = "Stable Release"
+stableReleaseTitle = "Version Stable"
 releaseNotesFailed = "Failed to load release notes."
 
 [js.settings.updates]
-newReleaseTitle = "New Release Available"
+newReleaseTitle = "Mise à jour Disponible"
 newPreReleaseTitle = "New Pre-release Available"
-downloadingButton = "Downloading.."
-downloadButton = 'Download from GitHub<span style="font-size: 10px;color: gray;text-shadow: none !important;">Close the launcher and run the dmg to update.</span>'
-latestVersionTitle = "You Are Running the Latest Version"
-checkForUpdatesButton = "Check for Updates"
-checkingForUpdatesButton = "Checking for Updates.."
+downloadingButton = "Téléchargement.."
+downloadButton = 'Télécharger<span style="font-size: 10px;color: gray;text-shadow: none !important;">Close the launcher and run the dmg to update.</span>'
+latestVersionTitle = "Tu as la dernière version"
+checkForUpdatesButton = "Vérifier les mises à jour"
+checkingForUpdatesButton = "Vérification des mises à jour..."
 
 [js.settings.msftLogin]
 errorTitle = "Microsoft Login Failed"

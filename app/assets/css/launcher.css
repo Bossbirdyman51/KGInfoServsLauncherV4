@@ -1116,6 +1116,7 @@ body, button {
 .settingsNavItem {
     background: none;
     border: none;
+    font-size: 15px;
     text-align: left;
     margin: 5px 0px;
     padding: 0px 20px;
@@ -1127,11 +1128,13 @@ body, button {
 .settingsNavItem:hover,
 .settingsNavItem:focus {
     color: #c1c1c1;
+    font-size: 20px;
     text-shadow: 0px 0px 20px #c1c1c1;
 }
 .settingsNavItem[selected] {
     cursor: default;
     color: white;
+    font-size: 23px;
     text-shadow: none;
 }
 
@@ -1159,6 +1162,7 @@ body, button {
 #settingsNavDone {
     background: none;
     border: none;
+    font-size: 15px;
     text-align: left;
     margin: 5px 0px;
     padding: 0px 20px;
@@ -3060,16 +3064,15 @@ input:checked + .toggleSwitchSlider:before {
 /* Social media icon shared styles. */
 .mediaSVG {
     fill: #ffffff;
-    height: 12px;
+    height: 20px;
     transition: 0.25s ease;
     cursor: pointer;
-    height: 12px;
     width: 25px;
 }
 .mediaSVG:hover,
 .mediaURL:focus .mediaSVG,
 .mediaSVG:active {
-    height: 20px;
+    height: 30px;
 }
 
 /* Social media URL shared styles. */
@@ -3094,12 +3097,12 @@ input:checked + .toggleSwitchSlider:before {
 /* Settings icon colors. */
 #settingsSVG {
     stroke: #ffffff;
-    height: 15px;
+    height: 20px;
 }
 .mediaButton:hover #settingsSVG,
 .mediaButton:focus #settingsSVG,
 .mediaButton:active #settingsSVG {
-    height: 23px;
+    height: 30px;
 }
 
 /* Settings tooltip styles. */
@@ -3181,9 +3184,10 @@ input:checked + .toggleSwitchSlider:before {
 
 /* Style for a general label on the bottom of the landing view. */
 .bot_label {
-    font-size: 9px;
+    font-size: 15px;
     letter-spacing: 1px;
     font-weight: bold;
+    margin-left: 10px;
     text-shadow: 0px 0px 0px #bebcbb;
 }
 
@@ -3209,7 +3213,7 @@ input:checked + .toggleSwitchSlider:before {
 /* Span which displays the player count of the selected server. */
 #player_count {
     color: #949494;
-    font-size: 8px;
+    font-size: 15px;
     font-weight: 900;
     text-shadow: 0px 0px 20px #949494;
     margin-left: 10px;
@@ -3365,7 +3369,7 @@ input:checked + .toggleSwitchSlider:before {
 
 /* Arrow image which floats above the news button. */
 #newsButtonSVG {
-    height: 11px;
+    height: 19px;
     margin-left: -2px;
     transition: 0.25s ease;
 }
