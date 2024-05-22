@@ -131,8 +131,8 @@ continueButton = "CONTINUER"
 
 
 [js.discord]
-waiting = "Waiting for Client.."
-state = "Server: {shortId}"
+waiting = "En attente.."
+state = "Serveur: {shortId}"
 
 [js.index]
 microsoftLoginTitle = "Microsoft Login"
@@ -211,9 +211,9 @@ checkConsoleForDetails = "Please check the console (CTRL + Shift + i) for more d
 checking = "Checking for News"
 
 [js.landing.discord]
-loading = "Loading game.."
-joining = "Sailing to Westeros!"
-joined = "Exploring the Realm!"
+loading = "Chargement du jeux.."
+joining = "En train de jouer"
+joined = "En train de jouer"
 
 [js.overlay]
 dismiss = "Dismiss"
@@ -245,8 +245,8 @@ cancelButton = "Cancel"
 [js.settings.authAccountPopulate]
 username = "Username"
 uuid = "UUID"
-selectAccount = "Select Account"
-selectedAccount = "Selected Account ✓"
+selectAccount = "Séléctionner un compte"
+selectedAccount = "Compte séléctionné ✓"
 logout = "Log Out"
 
 [js.settings.dropinMods]
