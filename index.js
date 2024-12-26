@@ -31,7 +31,7 @@ function initAutoUpdater(event, data) {
         autoUpdater.updateConfigPath = path.join(__dirname, 'dev-app-update.yml')
     }
     if(process.platform === 'darwin'){
-        autoUpdater.autoDownload = false
+        autoUpdater.autoDownload = true
     }
     autoUpdater.on('update-available', (info) => {
         event.sender.send('autoUpdateNotification', 'update-available', info)
@@ -343,7 +343,16 @@ function getPlatformIcon(filename){
 
 app.on('ready', createWindow)
 app.on('ready', createMenu)
-
+app.on('ready', () => {
+    console.log('Lancement de la vérification des mises à jour...');
+    autoUpdater.checkForUpdates()
+        .then(() => {
+            console.log('Vérification des mises à jour effectuée.');
+        })
+        .catch(err => {
+            console.error('Erreur lors de la vérification des mises à jour :', err);
+        });
+});
 app.on('window-all-closed', () => {
     // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q

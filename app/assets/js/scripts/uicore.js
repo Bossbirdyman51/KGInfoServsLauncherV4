@@ -71,7 +71,7 @@ if(!isDev){
             case 'ready':
                 updateCheckListener = setInterval(() => {
                     ipcRenderer.send('autoUpdateAction', 'checkForUpdate')
-                }, 1800000)
+                }, 300000)
                 ipcRenderer.send('autoUpdateAction', 'checkForUpdate')
                 break
             case 'realerror':
