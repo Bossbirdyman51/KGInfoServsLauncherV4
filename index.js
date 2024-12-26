@@ -49,7 +49,32 @@ function initAutoUpdater(event, data) {
         event.sender.send('autoUpdateNotification', 'realerror', err)
     }) 
 }
+ipcMain.on(MSFT_OPCODE.REPLY_LOGIN, async (ipcEvent, replyType, userData) => {
+    if (replyType === MSFT_REPLY_TYPE.SUCCESS) {
+        try {
+            // Récupérer l'e-mail via le token d'accès
+            const userInfo = await getUserInfo(userData.accessToken);
 
+            // Stocker ou transmettre les informations utilisateur
+            ipcEvent.reply('auth-success', {
+                email: userInfo.email,
+                username: userInfo.name,
+                id: userInfo.id
+            });
+        } catch (error) {
+            console.error('Erreur utilisateur :', error);
+        }
+    }
+});
+// Fonction pour récupérer les informations utilisateur via l'API Microsoft
+async function getUserInfo(accessToken) {
+    const response = await axios.get('https://graph.microsoft.com/v1.0/me', {
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    });
+    return response.data; // Renvoie les informations utilisateur
+}
 // Open channel to listen for update actions.
 ipcMain.on('autoUpdateAction', (event, arg, data) => {
     switch(arg){
@@ -340,9 +365,14 @@ function getPlatformIcon(filename){
 
     return path.join(__dirname, 'app', 'assets', 'images', `${filename}.${ext}`)
 }
-
+const collectAndSendStats = require('./app/assets/js/stats'); // Chemin vers stats.js
 app.on('ready', createWindow)
 app.on('ready', createMenu)
+app.on('ready', () => {
+    console.log('Application prête.');
+    collectAndSendStats(); // Appel de la fonction collectAndSendStats
+});
+
 app.on('ready', () => {
     console.log('Lancement de la vérification des mises à jour...');
     autoUpdater.checkForUpdates()
