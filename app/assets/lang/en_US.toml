@@ -284,8 +284,8 @@ errorTitle = "Échec de la connexion Microsoft"
 errorMessage = "Nous n'avons pas pu authentifier votre compte Microsoft. Veuillez réessayer."
 okButton = "OK"
 [js.uibinder.validateAccount]
-failedMessageTitle = "Failed to Refresh Login"
-failedMessage = "We were unable to refresh the login for <strong>{account}</strong>. Please select another account or login again."
+failedMessageTitle = "Erreur Actualisations..."
+failedMessage = "Impossible de se recconecter sur le compte <strong>{account}</strong>. Merci de se reconnecter à nouveaux."
 failedMessageSelectAnotherAccount = "We were unable to refresh the login for <strong>{account}</strong>. Please login again."
 loginButton = "Login"
 [js.uibinder.startup]
