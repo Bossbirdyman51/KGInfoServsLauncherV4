@@ -286,8 +286,8 @@ okButton = "OK"
 [js.uibinder.validateAccount]
 failedMessageTitle = "Erreur Actualisations..."
 failedMessage = "Impossible de se recconecter sur le compte <strong>{account}</strong>. Merci de se reconnecter à nouveaux."
-failedMessageSelectAnotherAccount = "We were unable to refresh the login for <strong>{account}</strong>. Please login again."
-loginButton = "Login"
+failedMessageSelectAnotherAccount = "Expiration du token pour le compte <strong>{account}</strong>. Merci de se reconnecter."
+loginButton = "Se connecter"
 [js.uibinder.startup]
 selectAnotherAccountButton = "Sélectionner un autre compte"
 fatalErrorTitle = "Erreur fatale : Impossible de charger l'index de distribution"
