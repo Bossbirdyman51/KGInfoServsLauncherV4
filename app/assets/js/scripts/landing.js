@@ -659,68 +659,36 @@ let newsGlideCount = 0
  * 
  * @param {boolean} up True to slide up, otherwise false. 
  */
-function slide_(up){
-    const lCUpper = document.querySelector('#landingContainer > #upper')
-    const lCLLeft = document.querySelector('#landingContainer > #lower > #left')
-    const lCLCenter = document.querySelector('#landingContainer > #lower > #center')
-    const lCLRight = document.querySelector('#landingContainer > #lower > #right')
-    const newsBtn = document.querySelector('#landingContainer > #lower > #center #content')
-    const landingContainer = document.getElementById('landingContainer')
-    const newsContainer = document.querySelector('#landingContainer > #newsContainer')
+function showNewsOverlay(show) {
+    const newsContainer = document.getElementById('newsContainer');
+    const landingContainer = document.getElementById('landingContainer');
 
-    newsGlideCount++
-
-    if(up){
-        lCUpper.style.top = '-200vh'
-        lCLLeft.style.top = '-200vh'
-        lCLCenter.style.top = '-200vh'
-        lCLRight.style.top = '-200vh'
-        newsBtn.style.top = '130vh'
-        newsContainer.style.top = '0px'
-        //date.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'})
-        //landingContainer.style.background = 'rgba(29, 29, 29, 0.55)'
-        landingContainer.style.background = 'rgba(0, 0, 0, 0.50)'
-        setTimeout(() => {
-            if(newsGlideCount === 1){
-                lCLCenter.style.transition = 'none'
-                newsBtn.style.transition = 'none'
-            }
-            newsGlideCount--
-        }, 2000)
+    if (show) {
+        newsContainer.style.display = 'flex';
+        landingContainer.style.background = 'rgba(0, 0, 0, 0.50)';
+        newsActive = true;
     } else {
-        setTimeout(() => {
-            newsGlideCount--
-        }, 2000)
-        landingContainer.style.background = null
-        lCLCenter.style.transition = null
-        newsBtn.style.transition = null
-        newsContainer.style.top = '100%'
-        lCUpper.style.top = '0px'
-        lCLLeft.style.top = '0px'
-        lCLCenter.style.top = '0px'
-        lCLRight.style.top = '0px'
-        newsBtn.style.top = '10px'
+        newsContainer.style.display = 'none';
+        landingContainer.style.background = null;
+        newsActive = false;
     }
 }
 
 // Bind news button.
 document.getElementById('newsButton').onclick = () => {
-    // Toggle tabbing.
-    if(newsActive){
-        $('#landingContainer *').removeAttr('tabindex')
-        $('#newsContainer *').attr('tabindex', '-1')
-    } else {
-        $('#landingContainer *').attr('tabindex', '-1')
-        $('#newsContainer, #newsContainer *, #lower, #lower #center *').removeAttr('tabindex')
-        if(newsAlertShown){
-            $('#newsButtonAlert').fadeOut(2000)
-            newsAlertShown = false
-            ConfigManager.setNewsCacheDismissed(true)
-            ConfigManager.save()
-        }
+    showNewsOverlay(false);
+}
+
+// Bind news close button.
+document.getElementById('newsCloseButton').onclick = () => {
+    showNewsOverlay(false)
+}
+
+// Bind click on overlay to close it.
+document.getElementById('newsContainer').onclick = (e) => {
+    if(e.target.id === 'newsContainer'){
+        showNewsOverlay(false)
     }
-    slide_(!newsActive)
-    newsActive = !newsActive
 }
 
 // Array to store article meta.
@@ -822,6 +790,8 @@ async function initNews(){
     const news = await loadNews()
 
     newsArr = news?.articles || null
+
+    populateMainNews(newsArr)
 
     if(newsArr == null){
         // News Loading Failed
@@ -993,6 +963,18 @@ async function loadNews(){
                         content = content.replace(`"${matches[1]}"`, `"${newsHost + matches[1]}"`)
                     }
 
+                    // Extract image from content.
+                    let image = null
+                    const imgRegex = /<img src="(.+?)"/
+                    const imgMatch = content.match(imgRegex)
+                    if(imgMatch){
+                        image = imgMatch[1]
+                        // Check if the image URL is relative.
+                        if(!image.startsWith('http')){
+                            image = newsHost + image
+                        }
+                    }
+
                     let link   = el.find('link').text()
                     let title  = el.find('title').text()
                     let author = el.find('dc\\:creator').text()
@@ -1006,7 +988,8 @@ async function loadNews(){
                             author,
                             content,
                             comments,
-                            commentsLink: link + '#comments'
+                            commentsLink: link + '#comments',
+                            image
                         }
                     )
                 }
@@ -1024,3 +1007,48 @@ async function loadNews(){
 
     return await promise
 }
+
+/**
+ * Populate the main news feed on the landing page.
+ *
+ * @param {Array.<Object>} articles An array of article objects.
+ */
+function populateMainNews(articles){
+    const mainNewsArticles = document.getElementById('mainNewsArticles')
+    mainNewsArticles.innerHTML = ''
+
+    if(articles && articles.length > 0){
+        const articlesToShow = articles.slice(0, 3)
+        articlesToShow.forEach((article, index) => {
+            const articleElement = document.createElement('div')
+            articleElement.className = 'mainNewsArticle'
+            
+            if(article.image){
+                const articleImage = document.createElement('img')
+                articleImage.className = 'mainNewsArticleImage'
+                articleImage.src = article.image
+                articleElement.appendChild(articleImage)
+            }
+            
+            const articleTitle = document.createElement('div')
+            articleTitle.className = 'mainNewsArticleTitle'
+            articleTitle.innerHTML = article.title
+            
+            articleElement.appendChild(articleTitle)
+
+            // Show the full article in the overlay on click.
+            articleElement.onclick = () => {
+                const fullIndex = newsArr.findIndex(a => a.link === article.link)
+                displayArticle(article, fullIndex + 1)
+                showNewsOverlay(true)
+            }
+
+            mainNewsArticles.appendChild(articleElement)
+        })
+    } else {
+        mainNewsArticles.innerHTML = '<div class="mainNewsArticle"><div class="mainNewsArticleTitle">Aucune actualité pour le moment.</div></div>'
+    }
+}
+
+// Initialize news when the page loads.
+initNews()
