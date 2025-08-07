@@ -2753,6 +2753,7 @@ input:checked + .toggleSwitchSlider:before {
 
 #newsArticleContentWrapper {
     width: 80%;
+    margin: 0 auto;
 }
 
 .newsArticleSpacerTop {
