@@ -698,12 +698,11 @@ let newsGlideCount = 0
 function showNewsOverlay(show) {
     const newsContainer = document.getElementById('newsContainer');
 
+    newsActive = show;
     if (show) {
-        newsContainer.style.display = 'flex';
-        newsActive = true;
+        newsContainer.classList.add('active');
     } else {
-        newsContainer.style.display = 'none';
-        newsActive = false;
+        newsContainer.classList.remove('active');
     }
 }
 

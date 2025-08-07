@@ -2516,11 +2516,21 @@ input:checked + .toggleSwitchSlider:before {
     left: 0;
     height: 100%;
     width: 100%;
-    display: none; /* Initially hidden */
+    display: flex; /* Changed from none */
     align-items: center;
     justify-content: center;
     z-index: 1000; /* Make sure it's on top */
     background-color: rgba(0, 0, 0, 0.7);
+    
+    /* Animation properties */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#newsContainer.active {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 /* News content container. */
@@ -2535,6 +2545,16 @@ input:checked + .toggleSwitchSlider:before {
     background: #1e1e1e;
     border-radius: 10px;
     box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+
+    /* Animation properties */
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease-out;
+}
+
+#newsContainer.active #newsContent {
+    transform: scale(1);
+    opacity: 1;
 }
 
 /* Drop shadow displayed when content is scrolled out of view. */
@@ -3942,11 +3962,19 @@ input:checked + .toggleSwitchSlider:before {
  ******************************************************************************/
 
 .view-content {
-    display: none;
+    display: block; /* On utilise l'opacité pour cacher, plus display:none */
+    opacity: 0;
+    pointer-events: none; /* Empêche les clics sur les vues cachées */
+    transition: opacity 0.4s ease-in-out; /* La durée et le type de l'animation */
+    position: absolute; /* Permet de superposer les vues pour la transition */
+    width: 100%;
+    height: 100%;
 }
 
 .view-content.active {
-    display: block;
+    opacity: 1;
+    pointer-events: auto; /* Autorise les clics sur la vue active */
+    z-index: 1; /* S'assure que la vue active est au-dessus */
 }
 
 /*******************************************************************************
