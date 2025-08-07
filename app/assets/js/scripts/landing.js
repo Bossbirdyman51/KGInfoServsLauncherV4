@@ -3,6 +3,7 @@
  */
 // Requirements
 const { URL }                 = require('url')
+const axios                   = require('axios')
 const {
     MojangRestAPI,
     getServerStatus
@@ -52,10 +53,10 @@ const loggerLanding = LoggerUtil.getLogger('Landing')
 function toggleLaunchArea(loading){
     if(loading){
         launch_details.style.display = 'flex'
-        launch_content.style.display = 'none'
+        document.getElementById('launch_button').style.display = 'none'
     } else {
         launch_details.style.display = 'none'
-        launch_content.style.display = 'inline-flex'
+        document.getElementById('launch_button').style.display = 'block'
     }
 }
 
@@ -158,22 +159,57 @@ updateSelectedAccount(ConfigManager.getSelectedAccount())
 
 // Bind selected server
 function updateSelectedServer(serv){
-    if(getCurrentView() === VIEWS.settings){
-        fullSettingsSave()
+    try {
+        loggerLanding.debug('Mise à jour du serveur sélectionné:', {
+            serverId: serv?.rawServer?.id,
+            servName: serv?.rawServer?.name
+        })
+
+        if(getCurrentView() === VIEWS.settings){
+            fullSettingsSave()
+        }
+
+        if(!server_selection_button) {
+            loggerLanding.error('Element server_selection_button non trouvé')
+            return
+        }
+
+        ConfigManager.setSelectedServer(serv != null ? serv.rawServer.id : null)
+        ConfigManager.save()
+        
+        server_selection_button.innerHTML = '&#8226; ' + (serv != null ? serv.rawServer.name : Lang.queryJS('landing.noSelection'))
+        
+        if(getCurrentView() === VIEWS.settings){
+            animateSettingsTabRefresh()
+        }
+        
+        setLaunchEnabled(serv != null)
+        
+        loggerLanding.info('Serveur sélectionné mis à jour avec succès')
+    } catch(err) {
+        loggerLanding.error('Erreur lors de la mise à jour du serveur sélectionné:', {
+            error: err.message,
+            stack: err.stack
+        })
     }
-    ConfigManager.setSelectedServer(serv != null ? serv.rawServer.id : null)
-    ConfigManager.save()
-    server_selection_button.innerHTML = '&#8226; ' + (serv != null ? serv.rawServer.name : Lang.queryJS('landing.noSelection'))
-    if(getCurrentView() === VIEWS.settings){
-        animateSettingsTabRefresh()
-    }
-    setLaunchEnabled(serv != null)
 }
 // Real text is set in uibinder.js on distributionIndexDone.
-server_selection_button.innerHTML = '&#8226; ' + Lang.queryJS('landing.selectedServer.loading')
-server_selection_button.onclick = async e => {
-    e.target.blur()
-    await toggleServerSelection(true)
+if(server_selection_button) {
+    server_selection_button.innerHTML = '&#8226; ' + Lang.queryJS('landing.selectedServer.loading')
+    server_selection_button.onclick = async e => {
+        try {
+            loggerLanding.debug('Clic sur le bouton de sélection de serveur')
+            e.target.blur()
+            await toggleServerSelection(true)
+        } catch(err) {
+            loggerLanding.error('Erreur lors de la sélection du serveur:', {
+                error: err.message,
+                stack: err.stack
+            })
+        }
+    }
+} else {
+    loggerLanding.error('Element server_selection_button non trouvé')
 }
 
 // Update Mojang Status Color
@@ -661,27 +697,34 @@ let newsGlideCount = 0
  */
 function showNewsOverlay(show) {
     const newsContainer = document.getElementById('newsContainer');
-    const landingContainer = document.getElementById('landingContainer');
 
     if (show) {
         newsContainer.style.display = 'flex';
-        landingContainer.style.background = 'rgba(0, 0, 0, 0.50)';
         newsActive = true;
     } else {
         newsContainer.style.display = 'none';
-        landingContainer.style.background = null;
         newsActive = false;
     }
 }
 
 // Bind news button.
-document.getElementById('newsButton').onclick = () => {
-    showNewsOverlay(false);
+const newsButton = document.getElementById('newsButton')
+if(newsButton) {
+    newsButton.onclick = () => {
+        showNewsOverlay(true)
+    }
+} else {
+    loggerLanding.error('Element newsButton non trouvé')
 }
 
 // Bind news close button.
-document.getElementById('newsCloseButton').onclick = () => {
-    showNewsOverlay(false)
+const newsCloseButton = document.getElementById('newsCloseButton')
+if(newsCloseButton) {
+    newsCloseButton.onclick = () => {
+        showNewsOverlay(false)
+    }
+} else {
+    loggerLanding.error('Element newsCloseButton non trouvé')
 }
 
 // Bind click on overlay to close it.
@@ -696,30 +739,52 @@ let newsArr = null
 
 // News load animation listener.
 let newsLoadingListener = null
+let newsLoadingDots = '..'
 
 /**
  * Set the news loading animation.
- * 
+ *
  * @param {boolean} val True to set loading animation, otherwise false.
  */
 function setNewsLoading(val){
-    if(val){
-        const nLStr = Lang.queryJS('landing.news.checking')
-        let dotStr = '..'
-        nELoadSpan.innerHTML = nLStr + dotStr
-        newsLoadingListener = setInterval(() => {
-            if(dotStr.length >= 3){
-                dotStr = ''
-            } else {
-                dotStr += '.'
-            }
-            nELoadSpan.innerHTML = nLStr + dotStr
-        }, 750)
-    } else {
-        if(newsLoadingListener != null){
-            clearInterval(newsLoadingListener)
-            newsLoadingListener = null
+    try {
+        if(!nELoadSpan) {
+            loggerLanding.error('Element nELoadSpan non trouvé')
+            return
         }
+
+        if(val){
+            const nLStr = Lang.queryJS('landing.news.checking')
+            nELoadSpan.innerHTML = nLStr + newsLoadingDots
+
+            if(newsLoadingListener) {
+                clearInterval(newsLoadingListener)
+            }
+
+            newsLoadingListener = setInterval(() => {
+                try {
+                    if(newsLoadingDots.length >= 3){
+                        newsLoadingDots = ''
+                    } else {
+                        newsLoadingDots += '.'
+                    }
+                    if(nELoadSpan) {
+                        nELoadSpan.innerHTML = nLStr + newsLoadingDots
+                    }
+                } catch(err) {
+                    loggerLanding.error('Erreur dans l\'animation de chargement:', err)
+                    clearInterval(newsLoadingListener)
+                    newsLoadingListener = null
+                }
+            }, 750)
+        } else {
+            if(newsLoadingListener != null){
+                clearInterval(newsLoadingListener)
+                newsLoadingListener = null
+            }
+        }
+    } catch(err) {
+        loggerLanding.error('Erreur dans setNewsLoading:', err)
     }
 }
 
@@ -756,14 +821,17 @@ function reloadNews(){
     })
 }
 
+// DOM Cache pour les alertes
+const newsButtonAlert = document.getElementById('newsButtonAlert')
 let newsAlertShown = false
 
 /**
  * Show the news alert indicating there is new news.
+ * Cette fonction est temporairement désactivée car l'élément newsButtonAlert n'existe pas.
  */
 function showNewsAlert(){
-    newsAlertShown = true
-    $(newsButtonAlert).fadeIn(250)
+    loggerLanding.debug('Notification de nouvelles actualités désactivée')
+    return
 }
 
 async function digestMessage(str) {
@@ -784,58 +852,65 @@ async function digestMessage(str) {
  * content has finished loading and transitioning.
  */
 async function initNews(){
+    loggerLanding.info('Initialisation des actualités...')
+    
+    try {
+        setNewsLoading(true)
+        const news = await loadNews()
+        loggerLanding.info('Résultat du chargement des actualités:', news)
 
-    setNewsLoading(true)
+        newsArr = news?.articles || null
 
-    const news = await loadNews()
+        populateMainNews(newsArr)
 
-    newsArr = news?.articles || null
+        if(newsArr == null){
+            // News Loading Failed
+            setNewsLoading(false)
 
-    populateMainNews(newsArr)
+            await $('#newsErrorLoading').fadeOut(250).promise()
+            await $('#newsErrorFailed').fadeIn(250).promise()
 
-    if(newsArr == null){
-        // News Loading Failed
-        setNewsLoading(false)
+        } else if(newsArr.length === 0) {
+            // No News Articles
+            setNewsLoading(false)
 
-        await $('#newsErrorLoading').fadeOut(250).promise()
-        await $('#newsErrorFailed').fadeIn(250).promise()
+            ConfigManager.setNewsCache({
+                date: null,
+                content: null,
+                dismissed: false
+            })
+            ConfigManager.save()
 
-    } else if(newsArr.length === 0) {
-        // No News Articles
-        setNewsLoading(false)
+            await $('#newsErrorLoading').fadeOut(250).promise()
+            await $('#newsErrorNone').fadeIn(250).promise()
+        } else {
+            // Success
+            setNewsLoading(false)
 
-        ConfigManager.setNewsCache({
-            date: null,
-            content: null,
-            dismissed: false
-        })
-        ConfigManager.save()
+            const lN = newsArr[0]
+            const cached = ConfigManager.getNewsCache()
+            let newHash = await digestMessage(lN.content)
+            let newDate = new Date(lN.date)
+            let isNew = false
 
-        await $('#newsErrorLoading').fadeOut(250).promise()
-        await $('#newsErrorNone').fadeIn(250).promise()
-    } else {
-        // Success
-        setNewsLoading(false)
+            if(cached.date != null && cached.content != null){
 
-        const lN = newsArr[0]
-        const cached = ConfigManager.getNewsCache()
-        let newHash = await digestMessage(lN.content)
-        let newDate = new Date(lN.date)
-        let isNew = false
+                if(new Date(cached.date) >= newDate){
 
-        if(cached.date != null && cached.content != null){
-
-            if(new Date(cached.date) >= newDate){
-
-                // Compare Content
-                if(cached.content !== newHash){
-                    isNew = true
-                    showNewsAlert()
-                } else {
-                    if(!cached.dismissed){
+                    // Compare Content
+                    if(cached.content !== newHash){
                         isNew = true
                         showNewsAlert()
+                    } else {
+                        if(!cached.dismissed){
+                            isNew = true
+                            showNewsAlert()
+                        }
                     }
+
+                } else {
+                    isNew = true
+                    showNewsAlert()
                 }
 
             } else {
@@ -843,32 +918,41 @@ async function initNews(){
                 showNewsAlert()
             }
 
-        } else {
-            isNew = true
-            showNewsAlert()
-        }
+            if(isNew){
+                ConfigManager.setNewsCache({
+                    date: newDate.getTime(),
+                    content: newHash,
+                    dismissed: false
+                })
+                ConfigManager.save()
+            }
 
-        if(isNew){
-            ConfigManager.setNewsCache({
-                date: newDate.getTime(),
-                content: newHash,
-                dismissed: false
-            })
-            ConfigManager.save()
-        }
+            const switchHandler = (forward) => {
+                let cArt = parseInt(newsContent.getAttribute('article'))
+                let nxtArt = forward ? (cArt >= newsArr.length-1 ? 0 : cArt + 1) : (cArt <= 0 ? newsArr.length-1 : cArt - 1)
+        
+                displayArticle(newsArr[nxtArt], nxtArt+1)
+            }
 
-        const switchHandler = (forward) => {
-            let cArt = parseInt(newsContent.getAttribute('article'))
-            let nxtArt = forward ? (cArt >= newsArr.length-1 ? 0 : cArt + 1) : (cArt <= 0 ? newsArr.length-1 : cArt - 1)
-    
-            displayArticle(newsArr[nxtArt], nxtArt+1)
+            document.getElementById('newsNavigateRight').onclick = () => { switchHandler(true) }
+            document.getElementById('newsNavigateLeft').onclick = () => { switchHandler(false) }
+            await $('#newsErrorContainer').fadeOut(250).promise()
+            displayArticle(newsArr[0], 1)
+            await $('#newsContent').fadeIn(250).promise()
         }
-
-        document.getElementById('newsNavigateRight').onclick = () => { switchHandler(true) }
-        document.getElementById('newsNavigateLeft').onclick = () => { switchHandler(false) }
-        await $('#newsErrorContainer').fadeOut(250).promise()
-        displayArticle(newsArr[0], 1)
-        await $('#newsContent').fadeIn(250).promise()
+    } catch (err) {
+        loggerLanding.error('Erreur lors de l\'initialisation des actualités:', {
+            message: err.message,
+            stack: err.stack,
+            type: err.name
+        })
+        try {
+            setNewsLoading(false)
+            await $('#newsErrorLoading').fadeOut(250).promise()
+            await $('#newsErrorFailed').fadeIn(250).promise()
+        } catch(fadeErr) {
+            loggerLanding.error('Erreur lors de l\'affichage du message d\'erreur:', fadeErr)
+        }
     }
 
 
@@ -926,86 +1010,230 @@ function displayArticle(articleObject, index){
  * Load news information from the RSS feed specified in the
  * distribution index.
  */
-async function loadNews(){
-
-    const distroData = await DistroAPI.getDistribution()
-    if(!distroData.rawDistribution.rss) {
-        loggerLanding.debug('No RSS feed provided.')
-        return null
-    }
-
-    const promise = new Promise((resolve, reject) => {
-        
-        const newsFeed = distroData.rawDistribution.rss
-        const newsHost = new URL(newsFeed).origin + '/'
-        $.ajax({
-            url: newsFeed,
-            success: (data) => {
-                const items = $(data).find('item')
-                const articles = []
-
-                for(let i=0; i<items.length; i++){
-                // JQuery Element
-                    const el = $(items[i])
-
-                    // Resolve date.
-                    const date = new Date(el.find('pubDate').text()).toLocaleDateString('fr-FR', {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'})
-
-                    // Resolve comments.
-                    let comments = el.find('slash\\:comments').text() || '0'
-                    comments = comments + ' Commentaire' + (comments === '1' ? '' : 's')
-
-                    // Fix relative links in content.
-                    let content = el.find('content\\:encoded').text()
-                    let regex = /src="(?!http:\/\/|https:\/\/)(.+?)"/g
-                    let matches
-                    while((matches = regex.exec(content))){
-                        content = content.replace(`"${matches[1]}"`, `"${newsHost + matches[1]}"`)
-                    }
-
-                    // Extract image from content.
-                    let image = null
-                    const imgRegex = /<img src="(.+?)"/
-                    const imgMatch = content.match(imgRegex)
-                    if(imgMatch){
-                        image = imgMatch[1]
-                        // Check if the image URL is relative.
-                        if(!image.startsWith('http')){
-                            image = newsHost + image
-                        }
-                    }
-
-                    let link   = el.find('link').text()
-                    let title  = el.find('title').text()
-                    let author = el.find('dc\\:creator').text()
-
-                    // Generate article.
-                    articles.push(
-                        {
-                            link,
-                            title,
-                            date,
-                            author,
-                            content,
-                            comments,
-                            commentsLink: link + '#comments',
-                            image
-                        }
-                    )
-                }
-                resolve({
-                    articles
-                })
-            },
-            timeout: 2500
-        }).catch(err => {
-            resolve({
-                articles: null
-            })
+async function testRSSUrl(url) {
+    try {
+        const response = await axios.head(url, {
+            timeout: 3000,
+            validateStatus: false
         })
-    })
+        loggerLanding.debug('Test RSS URL response:', {
+            status: response.status,
+            headers: response.headers
+        })
+        return response.status === 200
+    } catch (error) {
+        loggerLanding.error('Erreur lors du test de l\'URL RSS:', {
+            error: error.message,
+            type: error.name,
+            url: url
+        })
+        return false
+    }
+}
 
-    return await promise
+async function loadNews(){
+    try {
+        loggerLanding.info('Démarrage du processus de chargement des actualités')
+        
+        // 1. Récupération et validation de l'URL RSS
+        const distroData = await DistroAPI.getDistribution()
+        loggerLanding.debug('Données de distribution complètes:', {
+            rss: distroData?.rawDistribution?.rss,
+            hasDistro: !!distroData,
+            hasRawDistro: !!distroData?.rawDistribution
+        })
+        
+        if(!distroData?.rawDistribution?.rss) {
+            loggerLanding.error('URL du flux RSS non trouvée dans la configuration', {
+                distroData: distroData ? 'présent' : 'absent',
+                rawDistro: distroData?.rawDistribution ? 'présent' : 'absent'
+            })
+            return { articles: null }
+        }
+
+        const newsFeed = distroData.rawDistribution.rss
+        loggerLanding.info('Validation du flux RSS:', {
+            url: newsFeed,
+            urlType: typeof newsFeed,
+            isValidUrl: newsFeed.startsWith('http')
+        })
+        
+        const isAccessible = await testRSSUrl(newsFeed)
+        if (!isAccessible) {
+            loggerLanding.error('Le flux RSS n\'est pas accessible')
+            return { articles: null }
+        }
+        loggerLanding.debug('RSS Feed URL:', newsFeed)
+        const newsHost = new URL(newsFeed).origin + '/'
+
+        loggerLanding.info('Tentative d\'accès au flux RSS')
+        loggerLanding.debug('Paramètres de la requête:', {
+            url: new URL(newsFeed).href,
+            method: 'GET',
+            timeout: 5000
+        })
+        let response
+        try {
+            const startTime = Date.now()
+            response = await axios.get(newsFeed, {
+                headers: {
+                    'Accept': 'application/xml, text/xml, */*',
+                    'User-Agent': 'KGInfoServs-Launcher/1.1.3'
+                },
+                timeout: 5000,
+                responseType: 'text',
+                validateStatus: false
+            })
+            
+            const endTime = Date.now()
+            loggerLanding.info('Réponse du serveur RSS:', {
+                status: response.status,
+                contentType: response.headers['content-type'],
+                contentLength: response.headers['content-length'],
+                responseTime: `${endTime - startTime}ms`,
+                hasData: !!response.data,
+                dataLength: response.data?.length
+            })
+
+            // Vérification du type de contenu
+            const contentType = response.headers['content-type']
+            if (!contentType || !contentType.includes('xml')) {
+                loggerLanding.error('Le serveur n\'a pas renvoyé du XML:', contentType)
+                throw new Error(`Type de contenu invalide: ${contentType}`)
+            }
+            
+            if (response.status !== 200) {
+                throw new Error(`Erreur HTTP: ${response.status} - ${response.statusText}`)
+            }
+
+            // Vérification rapide du contenu
+            if (!response.data.includes('<?xml') && !response.data.includes('<rss')) {
+                loggerLanding.error('Le contenu ne semble pas être du XML valide')
+                loggerLanding.debug('Début du contenu:', response.data.substring(0, 100))
+                throw new Error('Le contenu ne semble pas être un flux RSS valide')
+            }
+        } catch (error) {
+            if (error.response) {
+                loggerLanding.error('RSS feed request failed:', {
+                    status: error.response.status,
+                    statusText: error.response.statusText,
+                    headers: error.response.headers,
+                    data: error.response.data
+                })
+            } else if (error.request) {
+                loggerLanding.error('No response received:', error.message)
+            } else {
+                loggerLanding.error('Error setting up request:', error.message)
+            }
+            throw error
+        }
+
+        const xmlText = response.data
+        loggerLanding.debug('RSS content length:', xmlText.length)
+        loggerLanding.debug('RSS content preview:', xmlText.substring(0, 200))
+        loggerLanding.info('RSS feed loaded successfully')
+        loggerLanding.debug('RSS response:', xmlText)
+
+        // Parse XML using DOMParser
+        const parser = new DOMParser()
+        const xmlDoc = parser.parseFromString(xmlText, 'text/xml')
+        
+        // Vérifier les erreurs de parsing XML
+        const parserError = xmlDoc.querySelector('parsererror')
+        if (parserError) {
+            loggerLanding.error('XML parsing error:', parserError.textContent)
+            throw new Error('Failed to parse RSS feed XML')
+        }
+        
+        loggerLanding.info('RSS feed parsed successfully')
+        
+        // Extraction des articles
+        const items = xmlDoc.getElementsByTagName('item')
+        loggerLanding.info(`Nombre d'articles trouvés: ${items.length}`)
+        const articles = []
+
+        for(let i=0; i<items.length; i++){
+            const item = items[i]
+            loggerLanding.debug(`Traitement de l'article ${i + 1}/${items.length}`)
+            
+            // Helper function to safely get text content
+            const getElementText = (tagName) => {
+                const element = item.getElementsByTagName(tagName)[0]
+                const text = element ? element.textContent : ''
+                loggerLanding.debug(`${tagName}: ${text ? text.substring(0, 50) + '...' : 'non trouvé'}`)
+                return text
+            }
+
+            // Resolve date
+            const pubDate = getElementText('pubDate')
+            const date = new Date(pubDate).toLocaleDateString('fr-FR', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric'
+            })
+
+            // Resolve comments
+            let comments = '0'
+            const slashComments = item.getElementsByTagNameNS('*', 'comments')[0]
+            if (slashComments) {
+                comments = slashComments.textContent
+            }
+            comments = comments + ' Commentaire' + (comments === '1' ? '' : 's')
+
+            // Get content
+            let content = ''
+            const contentEncoded = item.getElementsByTagNameNS('*', 'encoded')[0]
+            if (contentEncoded) {
+                content = contentEncoded.textContent
+            }
+
+            // Fix relative links in content
+            const regex = /src="(?!http:\/\/|https:\/\/)(.+?)"/g
+            let matches
+            while((matches = regex.exec(content))){
+                content = content.replace(`"${matches[1]}"`, `"${newsHost + matches[1]}"`)
+            }
+
+            // Extract image from content
+            let image = null
+            const imgRegex = /<img src="(.+?)"/
+            const imgMatch = content.match(imgRegex)
+            if(imgMatch){
+                image = imgMatch[1]
+                if(!image.startsWith('http')){
+                    image = newsHost + image
+                }
+            }
+
+            const link = getElementText('link')
+            const title = getElementText('title')
+            const author = item.getElementsByTagNameNS('*', 'creator')[0]?.textContent || ''
+
+            articles.push({
+                link,
+                title,
+                date,
+                author,
+                content,
+                comments,
+                commentsLink: link + '#comments',
+                image
+            })
+        }
+
+        return { articles }
+
+    } catch (err) {
+        loggerLanding.error('Erreur lors du chargement du flux RSS:', {
+            error: err.message,
+            type: err.name,
+            stack: err.stack,
+            url: distroData?.rawDistribution?.rss || 'URL non définie'
+        })
+        return { articles: null }
+    }
 }
 
 /**
@@ -1015,40 +1243,137 @@ async function loadNews(){
  */
 function populateMainNews(articles){
     const mainNewsArticles = document.getElementById('mainNewsArticles')
+    const newsNavigation = document.createElement('div')
+    newsNavigation.id = 'mainNewsNavigation'
     mainNewsArticles.innerHTML = ''
 
-    if(articles && articles.length > 0){
-        const articlesToShow = articles.slice(0, 3)
-        articlesToShow.forEach((article, index) => {
-            const articleElement = document.createElement('div')
-            articleElement.className = 'mainNewsArticle'
-            
-            if(article.image){
-                const articleImage = document.createElement('img')
-                articleImage.className = 'mainNewsArticleImage'
-                articleImage.src = article.image
-                articleElement.appendChild(articleImage)
-            }
-            
-            const articleTitle = document.createElement('div')
-            articleTitle.className = 'mainNewsArticleTitle'
-            articleTitle.innerHTML = article.title
-            
-            articleElement.appendChild(articleTitle)
+    let currentPage = 1
+    let articlesPerPage = 6
 
-            // Show the full article in the overlay on click.
-            articleElement.onclick = () => {
-                const fullIndex = newsArr.findIndex(a => a.link === article.link)
-                displayArticle(article, fullIndex + 1)
-                showNewsOverlay(true)
-            }
-
-            mainNewsArticles.appendChild(articleElement)
-        })
-    } else {
-        mainNewsArticles.innerHTML = '<div class="mainNewsArticle"><div class="mainNewsArticleTitle">Aucune actualité pour le moment.</div></div>'
+    function updateArticlesPerPage() {
+        if (window.innerWidth < 900) {
+            articlesPerPage = 3
+        } else {
+            articlesPerPage = 6
+        }
     }
+
+    function renderArticles(page) {
+        updateArticlesPerPage()
+        mainNewsArticles.innerHTML = ''
+        if(articles && articles.length > 0){
+            const start = (page - 1) * articlesPerPage
+            const end = start + articlesPerPage
+            const paginatedArticles = articles.slice(start, end)
+
+            paginatedArticles.forEach((article, index) => {
+                const articleElement = document.createElement('div')
+                articleElement.className = 'mainNewsArticle'
+                
+                if(article.image){
+                    const articleImage = document.createElement('img')
+                    articleImage.className = 'mainNewsArticleImage'
+                    articleImage.src = article.image
+                    articleImage.onerror = () => {
+                        loggerLanding.warn('Erreur de chargement de l\'image:', article.image)
+                        articleImage.parentElement.style.display = 'none'
+                    }
+                    articleElement.appendChild(articleImage)
+                }
+
+                const articleContent = document.createElement('div')
+                articleContent.className = 'mainNewsArticleContent'
+                
+                const articleTitle = document.createElement('div')
+                articleTitle.className = 'mainNewsArticleTitle'
+                articleTitle.innerHTML = article.title
+                
+                const articleMeta = document.createElement('div')
+                articleMeta.className = 'mainNewsArticleMeta'
+                articleMeta.innerHTML = `${article.date} | par ${article.author}`
+
+                articleContent.appendChild(articleTitle)
+                articleContent.appendChild(articleMeta)
+                articleElement.appendChild(articleContent)
+
+                articleElement.onclick = () => {
+                    const fullIndex = newsArr.findIndex(a => a.link === article.link)
+                    displayArticle(article, fullIndex + 1)
+                    showNewsOverlay(true)
+                }
+
+                mainNewsArticles.appendChild(articleElement)
+            })
+        } else {
+            mainNewsArticles.innerHTML = '<div class="mainNewsArticle"><div class="mainNewsArticleTitle">Aucune actualité pour le moment.</div></div>'
+        }
+        renderPagination()
+    }
+
+    function renderPagination() {
+        const totalPages = Math.ceil(articles.length / articlesPerPage)
+        if (totalPages > 1) {
+            newsNavigation.innerHTML = ''
+            
+            const prevButton = document.createElement('button')
+            prevButton.innerHTML = 'Précédent'
+            prevButton.disabled = currentPage === 1
+            prevButton.onclick = () => {
+                currentPage--
+                renderArticles(currentPage)
+            
+                window.addEventListener('resize', () => {
+                    renderArticles(currentPage)
+                })
+            }
+            newsNavigation.appendChild(prevButton)
+
+            const pageInfo = document.createElement('span')
+            pageInfo.innerHTML = `Page ${currentPage} sur ${totalPages}`
+            newsNavigation.appendChild(pageInfo)
+
+            const nextButton = document.createElement('button')
+            nextButton.innerHTML = 'Suivant'
+            nextButton.disabled = currentPage === totalPages
+            nextButton.onclick = () => {
+                currentPage++
+                renderArticles(currentPage)
+            }
+            newsNavigation.appendChild(nextButton)
+
+            mainNewsArticles.appendChild(newsNavigation)
+        }
+    }
+
+    renderArticles(currentPage)
 }
 
 // Initialize news when the page loads.
 initNews()
+
+// Side Menu Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const menuItems = document.querySelectorAll('.side-menu-item')
+    const views = document.querySelectorAll('.view-content')
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+            // Do nothing if the item is already active
+            if(item.classList.contains('active')) {
+                return
+            }
+
+            // Remove active class from all menu items and views
+            menuItems.forEach(i => i.classList.remove('active'))
+            views.forEach(v => v.classList.remove('active'))
+
+            // Add active class to the clicked item and corresponding view
+            item.classList.add('active')
+            const viewName = item.getAttribute('view')
+            const viewToShow = document.querySelector(`.view-content[view="${viewName}"]`)
+            if(viewToShow) {
+                viewToShow.classList.add('active')
+            }
+        })
+    })
+})
