@@ -28,12 +28,14 @@ loginOptionMicrosoft.onclick = (e) => {
     })
 }
 
-loginOptionMojang.onclick = (e) => {
-    switchView(getCurrentView(), VIEWS.login, 500, 500, () => {
-        loginViewOnSuccess = loginOptionsViewOnLoginSuccess
-        loginViewOnCancel = loginOptionsViewOnLoginCancel
-        loginCancelEnabled(true)
-    })
+if(loginOptionMojang) {
+    loginOptionMojang.onclick = (e) => {
+        switchView(getCurrentView(), VIEWS.login, 500, 500, () => {
+            loginViewOnSuccess = loginOptionsViewOnLoginSuccess
+            loginViewOnCancel = loginOptionsViewOnLoginCancel
+            loginCancelEnabled(true)
+        })
+    }
 }
 
 loginOptionsCancelButton.onclick = (e) => {

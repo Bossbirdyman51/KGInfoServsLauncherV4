@@ -176,10 +176,6 @@ updateSelectedAccount(ConfigManager.getSelectedAccount())
 // Bind selected server
 function updateSelectedServer(serv){
     try {
-        loggerLanding.debug('Mise à jour du serveur sélectionné:', {
-            serverId: serv?.rawServer?.id,
-            servName: serv?.rawServer?.name
-        })
 
         if(getCurrentView() === VIEWS.settings){
             fullSettingsSave()
@@ -214,7 +210,6 @@ if(server_selection_button) {
     server_selection_button.innerHTML = '&#8226; ' + Lang.queryJS('landing.selectedServer.loading')
     server_selection_button.onclick = async e => {
         try {
-            loggerLanding.debug('Clic sur le bouton de sélection de serveur')
             e.target.blur()
             await toggleServerSelection(true)
         } catch(err) {
@@ -297,7 +292,6 @@ const refreshServerStatus = async (fade = false) => {
     try {
 
         const servStat = await getServerStatus(47, serv.hostname, serv.port)
-        console.log(servStat)
         pLabel = Lang.queryJS('landing.serverStatus.players')
         pVal = servStat.players.online + '/' + servStat.players.max
 
@@ -737,14 +731,14 @@ function showNewsOverlay(show) {
 }
 
 // Bind news button.
-const newsButton = document.getElementById('newsButton')
-if(newsButton) {
-    newsButton.onclick = () => {
-        showNewsOverlay(true)
-    }
-} else {
-    loggerLanding.error('Element newsButton non trouvé')
-}
+// const newsButton = document.getElementById('newsButton')
+// if(newsButton) {
+//     newsButton.onclick = () => {
+//         showNewsOverlay(true)
+//     }
+// } else {
+//     loggerLanding.error('Element newsButton non trouvé')
+// }
 
 // Bind news close button.
 const newsCloseButton = document.getElementById('newsCloseButton')
@@ -886,7 +880,6 @@ async function initNews(){
     try {
         setNewsLoading(true)
         const news = await loadNews()
-        loggerLanding.info('Résultat du chargement des actualités:', news)
 
         newsArr = news?.articles || null
 
@@ -1045,10 +1038,6 @@ async function testRSSUrl(url) {
             timeout: 3000,
             validateStatus: false
         })
-        loggerLanding.debug('Test RSS URL response:', {
-            status: response.status,
-            headers: response.headers
-        })
         return response.status === 200
     } catch (error) {
         loggerLanding.error('Erreur lors du test de l\'URL RSS:', {
@@ -1062,15 +1051,9 @@ async function testRSSUrl(url) {
 
 async function loadNews(){
     try {
-        loggerLanding.info('Démarrage du processus de chargement des actualités')
         
         // 1. Récupération et validation de l'URL RSS
         const distroData = await DistroAPI.getDistribution()
-        loggerLanding.debug('Données de distribution complètes:', {
-            rss: distroData?.rawDistribution?.rss,
-            hasDistro: !!distroData,
-            hasRawDistro: !!distroData?.rawDistribution
-        })
         
         if(!distroData?.rawDistribution?.rss) {
             loggerLanding.error('URL du flux RSS non trouvée dans la configuration', {
@@ -1081,26 +1064,14 @@ async function loadNews(){
         }
 
         const newsFeed = distroData.rawDistribution.rss
-        loggerLanding.info('Validation du flux RSS:', {
-            url: newsFeed,
-            urlType: typeof newsFeed,
-            isValidUrl: newsFeed.startsWith('http')
-        })
         
         const isAccessible = await testRSSUrl(newsFeed)
         if (!isAccessible) {
             loggerLanding.error('Le flux RSS n\'est pas accessible')
             return { articles: null }
         }
-        loggerLanding.debug('RSS Feed URL:', newsFeed)
         const newsHost = new URL(newsFeed).origin + '/'
 
-        loggerLanding.info('Tentative d\'accès au flux RSS')
-        loggerLanding.debug('Paramètres de la requête:', {
-            url: new URL(newsFeed).href,
-            method: 'GET',
-            timeout: 5000
-        })
         let response
         try {
             const startTime = Date.now()
@@ -1115,14 +1086,6 @@ async function loadNews(){
             })
             
             const endTime = Date.now()
-            loggerLanding.info('Réponse du serveur RSS:', {
-                status: response.status,
-                contentType: response.headers['content-type'],
-                contentLength: response.headers['content-length'],
-                responseTime: `${endTime - startTime}ms`,
-                hasData: !!response.data,
-                dataLength: response.data?.length
-            })
 
             // Vérification du type de contenu
             const contentType = response.headers['content-type']
@@ -1138,7 +1101,6 @@ async function loadNews(){
             // Vérification rapide du contenu
             if (!response.data.includes('<?xml') && !response.data.includes('<rss')) {
                 loggerLanding.error('Le contenu ne semble pas être du XML valide')
-                loggerLanding.debug('Début du contenu:', response.data.substring(0, 100))
                 throw new Error('Le contenu ne semble pas être un flux RSS valide')
             }
         } catch (error) {
@@ -1158,10 +1120,6 @@ async function loadNews(){
         }
 
         const xmlText = response.data
-        loggerLanding.debug('RSS content length:', xmlText.length)
-        loggerLanding.debug('RSS content preview:', xmlText.substring(0, 200))
-        loggerLanding.info('RSS feed loaded successfully')
-        loggerLanding.debug('RSS response:', xmlText)
 
         // Parse XML using DOMParser
         const parser = new DOMParser()
@@ -1174,22 +1132,17 @@ async function loadNews(){
             throw new Error('Failed to parse RSS feed XML')
         }
         
-        loggerLanding.info('RSS feed parsed successfully')
         
         // Extraction des articles
         const items = xmlDoc.getElementsByTagName('item')
-        loggerLanding.info(`Nombre d'articles trouvés: ${items.length}`)
         const articles = []
 
         for(let i=0; i<items.length; i++){
             const item = items[i]
-            loggerLanding.debug(`Traitement de l'article ${i + 1}/${items.length}`)
-            
             // Helper function to safely get text content
             const getElementText = (tagName) => {
                 const element = item.getElementsByTagName(tagName)[0]
                 const text = element ? element.textContent : ''
-                loggerLanding.debug(`${tagName}: ${text ? text.substring(0, 50) + '...' : 'non trouvé'}`)
                 return text
             }
 

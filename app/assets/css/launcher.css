@@ -3207,7 +3207,9 @@ input:checked + .toggleSwitchSlider:before {
 #server_status_wrapper {
     display: inline-flex;
     width: 75px;
+    position: relative;
 }
+
 
 /* Span which displays the player count of the selected server. */
 #player_count {
