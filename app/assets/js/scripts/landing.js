@@ -1231,67 +1231,96 @@ function populateMainNews(articles){
     let currentPage = 1
     let articlesPerPage = 4
 
-    function renderArticles(page) {
-        mainNewsArticles.innerHTML = ''
-        if(articles && articles.length > 0){
-            const start = (page - 1) * articlesPerPage
-            const end = start + articlesPerPage
-            const paginatedArticles = articles.slice(start, end)
+    let isAnimating = false;
+    let lastPage = 1;
 
-            paginatedArticles.forEach((article, index) => {
-                const articleElement = document.createElement('div')
-                articleElement.className = 'mainNewsArticle'
-                
-                if(article.image){
-                    const articleImage = document.createElement('img')
-                    articleImage.className = 'mainNewsArticleImage'
-                    articleImage.src = article.image
-                    articleImage.onerror = () => {
-                        loggerLanding.warn('Erreur de chargement de l\'image:', article.image)
-                        articleImage.parentElement.style.display = 'none'
+    function renderArticles(page, direction = 'next') {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        const articlesContainer = document.getElementById('mainNewsArticles');
+        const slideOutClass = direction === 'next' ? 'slide-out-next' : 'slide-out-prev';
+        const slideInClass = direction === 'next' ? 'slide-in-next' : 'slide-in-prev';
+
+        // Slide out old articles
+        Array.from(articlesContainer.children).forEach(child => {
+            child.classList.add(slideOutClass);
+        });
+
+        setTimeout(() => {
+            articlesContainer.innerHTML = '';
+
+            if (articles && articles.length > 0) {
+                const start = (page - 1) * articlesPerPage;
+                const end = start + articlesPerPage;
+                const paginatedArticles = articles.slice(start, end);
+
+                paginatedArticles.forEach((article, index) => {
+                    const articleElement = document.createElement('div');
+                    articleElement.className = 'mainNewsArticle ' + slideInClass;
+
+                    if (article.image) {
+                        const articleImage = document.createElement('img');
+                        articleImage.className = 'mainNewsArticleImage';
+                        articleImage.src = article.image;
+                        articleImage.onerror = () => {
+                            loggerLanding.warn('Erreur de chargement de l\'image:', article.image);
+                            articleImage.parentElement.style.display = 'none';
+                        };
+                        articleElement.appendChild(articleImage);
                     }
-                    articleElement.appendChild(articleImage)
-                }
 
-                const articleContent = document.createElement('div')
-                articleContent.className = 'mainNewsArticleContent'
-                
-                const articleTitle = document.createElement('div')
-                articleTitle.className = 'mainNewsArticleTitle'
-                articleTitle.innerHTML = article.title
-                
-                const articleMeta = document.createElement('div')
-                articleMeta.className = 'mainNewsArticleMeta'
-                articleMeta.innerHTML = `${article.date} | par ${article.author}`
+                    const articleContent = document.createElement('div');
+                    articleContent.className = 'mainNewsArticleContent';
 
-                const articleDesc = document.createElement('div')
-                articleDesc.className = 'mainNewsArticleDesc'
-                
-                const tempDiv = document.createElement('div')
-                // Remove style tags before parsing
-                const cleanContent = article.content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-                tempDiv.innerHTML = cleanContent
-                const textContent = tempDiv.textContent || tempDiv.innerText || ''
-                
-                articleDesc.innerHTML = textContent.substring(0, 100) + '... <span class="read-more">Lire la suite</span>'
+                    const articleTitle = document.createElement('div');
+                    articleTitle.className = 'mainNewsArticleTitle';
+                    articleTitle.innerHTML = article.title;
 
-                articleContent.appendChild(articleTitle)
-                articleContent.appendChild(articleDesc)
-                articleContent.appendChild(articleMeta)
-                articleElement.appendChild(articleContent)
+                    const articleMeta = document.createElement('div');
+                    articleMeta.className = 'mainNewsArticleMeta';
+                    articleMeta.innerHTML = `${article.date} | par ${article.author}`;
 
-                articleElement.onclick = () => {
-                    const fullIndex = newsArr.findIndex(a => a.link === article.link)
-                    displayArticle(article, fullIndex + 1)
-                    showNewsOverlay(true)
-                }
+                    const articleDesc = document.createElement('div');
+                    articleDesc.className = 'mainNewsArticleDesc';
 
-                mainNewsArticles.appendChild(articleElement)
-            })
-        } else {
-            mainNewsArticles.innerHTML = '<div class="mainNewsArticle"><div class="mainNewsArticleTitle">Aucune actualité pour le moment.</div></div>'
-        }
-        renderPagination()
+                    const tempDiv = document.createElement('div');
+                    const cleanContent = article.content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+                    tempDiv.innerHTML = cleanContent;
+                    const textContent = tempDiv.textContent || tempDiv.innerText || '';
+
+                    articleDesc.innerHTML = textContent.substring(0, 100) + '... <span class="read-more">Lire la suite</span>';
+
+                    articleContent.appendChild(articleTitle);
+                    articleContent.appendChild(articleDesc);
+                    articleContent.appendChild(articleMeta);
+                    articleElement.appendChild(articleContent);
+
+                    articleElement.onclick = () => {
+                        const fullIndex = newsArr.findIndex(a => a.link === article.link);
+                        displayArticle(article, fullIndex + 1);
+                        showNewsOverlay(true);
+                    };
+
+                    articlesContainer.appendChild(articleElement);
+                });
+
+                // Slide in new articles
+                setTimeout(() => {
+                    Array.from(articlesContainer.children).forEach(child => {
+                        child.classList.remove(slideInClass);
+                    });
+                    isAnimating = false;
+                }, 50);
+
+            } else {
+                articlesContainer.innerHTML = '<div class="mainNewsArticle"><div class="mainNewsArticleTitle">Aucune actualité pour le moment.</div></div>';
+                isAnimating = false;
+            }
+
+            renderPagination();
+            lastPage = page;
+        }, 200);
     }
 
     function renderPagination() {
@@ -1312,7 +1341,7 @@ function populateMainNews(articles){
             prevButton.disabled = currentPage === 1
             prevButton.onclick = () => {
                 currentPage--
-                renderArticles(currentPage)
+                renderArticles(currentPage, 'prev')
             }
 
             const nextButton = document.createElement('button')
@@ -1321,7 +1350,7 @@ function populateMainNews(articles){
             nextButton.disabled = currentPage === totalPages
             nextButton.onclick = () => {
                 currentPage++
-                renderArticles(currentPage)
+                renderArticles(currentPage, 'next')
             }
 
             newsNavWrapper.appendChild(prevButton)

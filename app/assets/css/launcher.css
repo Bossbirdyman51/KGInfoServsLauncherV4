@@ -3007,15 +3007,19 @@ input:checked + .toggleSwitchSlider:before {
     justify-content: center;
     align-items: center;
     transition: 0.25s ease;
-    font-weight: bold;
-    letter-spacing: 2px;
-    background-color: rgba(0, 0, 0, 0.35);
+    background-color: rgba(0, 0, 0, 0.55);
     -webkit-user-select: none;
     border: none;
     cursor: pointer;
     width: 100%;
     height: 100%;
     border-radius: 50%;
+}
+
+.edit-icon-svg {
+    width: 20px;
+    height: 20px;
+    stroke: white;
 }
 #avatarOverlay:hover,
 #avatarOverlay:focus {
@@ -3397,18 +3401,23 @@ input:checked + .toggleSwitchSlider:before {
 }
 
 #launch_button {
-    background-color: #4CAF50;
+    background: linear-gradient(45deg, #4CAF50, #2e7d32);
     color: white;
     border: none;
-    padding: 10px 25px;
-    font-size: 18px;
+    padding: 15px 40px;
+    font-size: 22px;
     font-weight: bold;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 #launch_button:hover {
-    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(45deg, #5cb85c, #388e3c);
 }
 #launch_button:disabled {
     background-color: #555;
@@ -4031,7 +4040,7 @@ input:checked + .toggleSwitchSlider:before {
 #mainNewsArticles {
     display: flex;
     gap: 15px;
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: hidden;
     height: 350px;
     padding-right: 10px;
@@ -4043,12 +4052,31 @@ input:checked + .toggleSwitchSlider:before {
     background: rgba(30, 30, 30, 0.8);
     border-radius: 8px;
     overflow: hidden;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, opacity 0.2s ease-out, transform 0.2s ease-out;
     display: flex;
     flex-direction: column;
     cursor: pointer;
     width: 220px;
     height: 350px;
+    flex-shrink: 0;
+}
+
+.mainNewsArticle.slide-out-next {
+    transform: translateX(-100px);
+    opacity: 0;
+}
+.mainNewsArticle.slide-in-next {
+    transform: translateX(100px);
+    opacity: 0;
+}
+
+.mainNewsArticle.slide-out-prev {
+    transform: translateX(100px);
+    opacity: 0;
+}
+.mainNewsArticle.slide-in-prev {
+    transform: translateX(-100px);
+    opacity: 0;
 }
 
 .mainNewsArticle:hover {
