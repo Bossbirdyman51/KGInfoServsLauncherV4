@@ -1276,18 +1276,9 @@ function populateMainNews(articles){
     mainNewsArticles.innerHTML = ''
 
     let currentPage = 1
-    let articlesPerPage = 6
-
-    function updateArticlesPerPage() {
-        if (window.innerWidth < 900) {
-            articlesPerPage = 3
-        } else {
-            articlesPerPage = 6
-        }
-    }
+    let articlesPerPage = 4
 
     function renderArticles(page) {
-        updateArticlesPerPage()
         mainNewsArticles.innerHTML = ''
         if(articles && articles.length > 0){
             const start = (page - 1) * articlesPerPage
