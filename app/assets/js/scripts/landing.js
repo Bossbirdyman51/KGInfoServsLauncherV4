@@ -131,15 +131,31 @@ document.getElementById('launch_button').addEventListener('click', async e => {
 // Bind settings button
 document.getElementById('settingsMediaButton').onclick = async e => {
     await prepareSettings()
-    switchView(getCurrentView(), VIEWS.settings)
+    const settingsContainer = document.getElementById('settingsContainer')
+    settingsContainer.style.display = 'flex'
+    document.getElementById('main').setAttribute('overlay', 'true')
+    // Léger délai pour permettre au display de s'appliquer avant que la transition CSS ne commence
+    setTimeout(() => {
+        settingsContainer.classList.add('active')
+    }, 10)
 }
 
 // Bind avatar overlay button.
 document.getElementById('avatarOverlay').onclick = async e => {
     await prepareSettings()
-    switchView(getCurrentView(), VIEWS.settings, 500, 500, () => {
-        settingsNavItemListener(document.getElementById('settingsNavAccount'), false)
-    })
+    
+    // Sélectionner l'onglet "Compte" avant d'afficher les paramètres
+    settingsNavItemListener(document.getElementById('settingsNavAccount'), false)
+
+    // Ouvrir l'overlay des paramètres
+    const settingsContainer = document.getElementById('settingsContainer')
+    settingsContainer.style.display = 'flex'
+    document.getElementById('main').setAttribute('overlay', 'true')
+    
+    // Lancer l'animation d'apparition
+    setTimeout(() => {
+        settingsContainer.classList.add('active')
+    }, 10)
 }
 
 // Bind selected account

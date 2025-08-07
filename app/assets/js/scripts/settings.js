@@ -332,7 +332,13 @@ function fullSettingsSave() {
 /* Closes the settings view and saves all data. */
 settingsNavDone.onclick = () => {
     fullSettingsSave()
-    switchView(getCurrentView(), VIEWS.landing)
+    const settingsContainer = document.getElementById('settingsContainer')
+    document.getElementById('main').removeAttribute('overlay')
+    settingsContainer.classList.remove('active')
+    // Cacher l'élément après la fin de la transition de fondu.
+    setTimeout(() => {
+        settingsContainer.style.display = 'none'
+    }, 300) // Doit correspondre à la durée de la transition dans le CSS.
 }
 
 /**

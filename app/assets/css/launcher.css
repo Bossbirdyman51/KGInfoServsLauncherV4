@@ -1050,11 +1050,24 @@ body, button {
 
 /* Main settings container. */
 #settingsContainer {
-    position: relative;
-    height: 100%;
+    position: absolute;
+    top: 22px; /* Hauteur de la barre de titre */
+    left: 0;
+    height: calc(100% - 22px);
+    width: 100%;
     display: flex;
-    background-color: rgba(0, 0, 0, 0.50);
-    transition: background-color 0.25s cubic-bezier(.02, .01, .47, 1);
+    background-color: rgba(0, 0, 0, 0.70);
+    z-index: 1001; /* Au-dessus de tout */
+    
+    /* Animation */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#settingsContainer.active {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 /* Drop shadow displayed when content is scrolled out of view. */
