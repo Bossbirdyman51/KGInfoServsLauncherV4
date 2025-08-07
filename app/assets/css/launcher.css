@@ -2453,7 +2453,7 @@ input:checked + .toggleSwitchSlider:before {
 #landingContainer {
     display: flex;
     height: 100%;
-    background-color: #121212;
+    background-color: transparent;
     overflow: hidden;
     position: relative;
     width: 100%;
@@ -2462,7 +2462,7 @@ input:checked + .toggleSwitchSlider:before {
 #side-nav {
     width: 110px;
     min-width: 110px;
-    background-color: #1E1E1E;
+    background-color: rgba(30, 30, 30, 0.8);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2484,7 +2484,7 @@ input:checked + .toggleSwitchSlider:before {
     justify-content: flex-end;
     align-items: center;
     padding: 10px 20px;
-    background-color: #1E1E1E;
+    background-color: rgba(30, 30, 30, 0.8);
     box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
@@ -2499,7 +2499,7 @@ input:checked + .toggleSwitchSlider:before {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background-color: #1E1E1E;
+    background-color: rgba(30, 30, 30, 0.8);
     box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
 }
 
