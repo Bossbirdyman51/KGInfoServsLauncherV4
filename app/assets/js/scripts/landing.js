@@ -1271,9 +1271,8 @@ async function loadNews(){
  * @param {Array.<Object>} articles An array of article objects.
  */
 function populateMainNews(articles){
+    const mainNewsContent = document.getElementById('mainNewsContent')
     const mainNewsArticles = document.getElementById('mainNewsArticles')
-    const newsNavigation = document.createElement('div')
-    newsNavigation.id = 'mainNewsNavigation'
     mainNewsArticles.innerHTML = ''
 
     let currentPage = 1
@@ -1354,35 +1353,36 @@ function populateMainNews(articles){
     function renderPagination() {
         const totalPages = Math.ceil(articles.length / articlesPerPage)
         if (totalPages > 1) {
-            newsNavigation.innerHTML = ''
             
+            let newsNavWrapper = document.getElementById('mainNewsNavWrapper')
+            if(!newsNavWrapper){
+                newsNavWrapper = document.createElement('div')
+                newsNavWrapper.id = 'mainNewsNavWrapper'
+                mainNewsContent.appendChild(newsNavWrapper)
+            }
+            newsNavWrapper.innerHTML = ''
+
             const prevButton = document.createElement('button')
-            prevButton.innerHTML = 'Précédent'
+            prevButton.innerHTML = '<'
+            prevButton.className = 'news-nav-button prev'
             prevButton.disabled = currentPage === 1
             prevButton.onclick = () => {
                 currentPage--
                 renderArticles(currentPage)
-            
-                window.addEventListener('resize', () => {
-                    renderArticles(currentPage)
-                })
             }
-            newsNavigation.appendChild(prevButton)
-
-            const pageInfo = document.createElement('span')
-            pageInfo.innerHTML = `Page ${currentPage} sur ${totalPages}`
-            newsNavigation.appendChild(pageInfo)
 
             const nextButton = document.createElement('button')
-            nextButton.innerHTML = 'Suivant'
+            nextButton.innerHTML = '>'
+            nextButton.className = 'news-nav-button next'
             nextButton.disabled = currentPage === totalPages
             nextButton.onclick = () => {
                 currentPage++
                 renderArticles(currentPage)
             }
-            newsNavigation.appendChild(nextButton)
 
-            mainNewsArticles.appendChild(newsNavigation)
+            newsNavWrapper.appendChild(prevButton)
+            newsNavWrapper.appendChild(mainNewsArticles)
+            newsNavWrapper.appendChild(nextButton)
         }
     }
 

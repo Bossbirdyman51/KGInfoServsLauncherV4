@@ -3994,12 +3994,11 @@ input:checked + .toggleSwitchSlider:before {
  *                                                                             *
  ******************************************************************************/
 
-#mainNewsContainer {
-    width: 100%;
-    height: 100%;
+#mainNewsNavWrapper {
     display: flex;
+    align-items: center;
     justify-content: center;
-    align-items: flex-start;
+    height: 100%;
 }
 
 #mainNewsContent {
@@ -4009,6 +4008,8 @@ input:checked + .toggleSwitchSlider:before {
     box-shadow: none;
     padding: 0;
     height: 100%;
+    position: relative;
+    margin: 0 auto;
 }
 
 #mainNewsHeader {
@@ -4022,11 +4023,13 @@ input:checked + .toggleSwitchSlider:before {
 
 #mainNewsArticles {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 15px;
     overflow-y: auto;
-    height: calc(100% - 60px); /* Adjust based on header height */
+    height: 100%;
     padding-right: 10px;
+    width: 100%;
+    max-width: 1000px;
 }
 
 .mainNewsArticle {
@@ -4087,39 +4090,27 @@ input:checked + .toggleSwitchSlider:before {
     cursor: pointer;
     font-weight: bold;
 }
-#mainNewsNavigation {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 15px 0;
-}
-
-#mainNewsNavigation button {
-    background-color: #4CAF50;
+.news-nav-button {
+    background-color: rgba(76, 175, 80, 0.5);
     color: white;
     border: none;
-    padding: 8px 16px;
-    font-size: 14px;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
     font-weight: bold;
-    border-radius: 5px;
+    border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin: 0 10px;
+    margin: 0 15px;
 }
 
-#mainNewsNavigation button:hover {
-    background-color: #45a049;
+.news-nav-button:hover {
+    background-color: rgba(76, 175, 80, 0.8);
 }
 
-#mainNewsNavigation button:disabled {
-    background-color: #555;
+.news-nav-button:disabled {
+    background-color: rgba(85, 85, 85, 0.5);
     cursor: not-allowed;
-}
-
-#mainNewsNavigation span {
-    font-size: 14px;
-    font-weight: bold;
 }
 /* Cacher la section des mods requis dans les paramètres */
 #settingsReqModsContainer {
