@@ -2505,6 +2505,7 @@ input:checked + .toggleSwitchSlider:before {
     flex-grow: 1;
     padding: 20px;
     overflow: hidden;
+    position: relative;
 }
 
 #bottom-bar {
@@ -3391,6 +3392,8 @@ input:checked + .toggleSwitchSlider:before {
 #launch_content {
     display: flex;
     align-items: center;
+    justify-content: center;
+    padding: 20px 0;
 }
 
 #launch_button {
@@ -4009,13 +4012,11 @@ input:checked + .toggleSwitchSlider:before {
 
 #mainNewsContent {
     width: 100%;
-    max-width: 1200px;
     background: transparent;
     box-shadow: none;
     padding: 0;
-    height: 100%;
+    height: auto;
     position: relative;
-    margin: 0 auto;
 }
 
 #mainNewsHeader {
@@ -4032,10 +4033,10 @@ input:checked + .toggleSwitchSlider:before {
     gap: 15px;
     overflow-x: auto;
     overflow-y: hidden;
-    height: 100%;
+    height: 350px;
     padding-right: 10px;
     width: 100%;
-    max-width: 1000px;
+    justify-content: center;
 }
 
 .mainNewsArticle {
