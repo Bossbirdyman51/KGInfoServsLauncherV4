@@ -3108,27 +3108,29 @@ input:checked + .toggleSwitchSlider:before {
 #settingsTooltip {
     visibility: hidden;
     opacity: 0;
-    width: 75px;
-    height: 20px;
+    width: 90px;
     background-color: rgba(0, 0, 0, 0.75);
+    color: #fff;
     text-align: center;
     border-radius: 4px;
+    padding: 2px 0;
     position: absolute;
     z-index: 1;
-    right: 130%;
+    bottom: 125%; /* Position au-dessus de l'icône */
+    left: 50%;
+    margin-left: -45px; /* Centrer le tooltip (width/2) */
     font-size: 12px;
-    line-height: 20px;
     transition: visibility 0s linear 0.25s, opacity 0.25s ease;
 }
 #settingsTooltip::after {
     content: " ";
     position: absolute;
-    top: 50%;
-    left: 100%;
-    margin-top: -5px;
+    top: 100%; /* En bas du tooltip */
+    left: 50%;
+    margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: transparent transparent transparent rgba(0, 0, 0, 0.75);
+    border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
 }
 .mediaButton:hover #settingsTooltip,
 .mediaButton:focus #settingsTooltip,
@@ -4109,4 +4111,8 @@ input:checked + .toggleSwitchSlider:before {
 #mainNewsNavigation span {
     font-size: 14px;
     font-weight: bold;
+}
+/* Cacher la section des mods requis dans les paramètres */
+#settingsReqModsContainer {
+    display: none;
 }

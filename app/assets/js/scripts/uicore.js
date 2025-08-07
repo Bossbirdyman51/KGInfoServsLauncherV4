@@ -210,5 +210,14 @@ document.addEventListener('keydown', function (e) {
     if((e.key === 'I' || e.key === 'i') && e.ctrlKey && e.shiftKey){
         let window = remote.getCurrentWindow()
         window.toggleDevTools()
+    } else if(e.key === 'Escape') {
+        const settingsContainer = document.getElementById('settingsContainer')
+        const newsContainer = document.getElementById('newsContainer')
+
+        if(settingsContainer.classList.contains('active')){
+            document.getElementById('settingsNavDone').click()
+        } else if(newsContainer.classList.contains('active')){
+            document.getElementById('newsCloseButton').click()
+        }
     }
 })
