@@ -326,6 +326,20 @@ let mojangStatusListener = setInterval(() => refreshMojangStatuses(true), 60*60*
 // Set refresh rate to once every 5 minutes.
 let serverStatusListener = setInterval(() => refreshServerStatus(true), 300000)
 
+// Mojang Status Hover
+const mojangStatusWrapper = document.getElementById('mojangStatusWrapper')
+const mojangStatusTooltip = document.getElementById('mojangStatusTooltip')
+
+mojangStatusWrapper.addEventListener('mouseenter', () => {
+    mojangStatusTooltip.style.visibility = 'visible'
+    mojangStatusTooltip.style.opacity = '1'
+})
+
+mojangStatusWrapper.addEventListener('mouseleave', () => {
+    mojangStatusTooltip.style.visibility = 'hidden'
+    mojangStatusTooltip.style.opacity = '0'
+})
+
 /**
  * Shows an error overlay, toggles off the launch area.
  * 
@@ -1213,7 +1227,7 @@ async function loadNews(){
 
             // Extract image from content
             let image = null
-            const imgRegex = /<img src="(.+?)"/
+            const imgRegex = /<img[^>]+src="([^">]+)"/
             const imgMatch = content.match(imgRegex)
             if(imgMatch){
                 image = imgMatch[1]
@@ -1307,7 +1321,19 @@ function populateMainNews(articles){
                 articleMeta.className = 'mainNewsArticleMeta'
                 articleMeta.innerHTML = `${article.date} | par ${article.author}`
 
+                const articleDesc = document.createElement('div')
+                articleDesc.className = 'mainNewsArticleDesc'
+                
+                const tempDiv = document.createElement('div')
+                // Remove style tags before parsing
+                const cleanContent = article.content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+                tempDiv.innerHTML = cleanContent
+                const textContent = tempDiv.textContent || tempDiv.innerText || ''
+                
+                articleDesc.innerHTML = textContent.substring(0, 100) + '... <span class="read-more">Lire la suite</span>'
+
                 articleContent.appendChild(articleTitle)
+                articleContent.appendChild(articleDesc)
                 articleContent.appendChild(articleMeta)
                 articleElement.appendChild(articleContent)
 
