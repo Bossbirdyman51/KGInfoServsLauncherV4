@@ -1428,7 +1428,7 @@ function populateAboutVersionInformation(){
  */
 function populateReleaseNotes(){
     $.ajax({
-        url: 'https://github.com/Bossbirdyman51/KGInfoServsLauncherV4/releases.atom',
+        url: 'https://github.com/Bossbirdyman51/KGInfoServs-Launcher/releases.atom',
         success: (data) => {
             const version = 'v' + remote.app.getVersion()
             const entries = $(data).find('entry')
