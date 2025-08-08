@@ -49,3 +49,8 @@ linux:
 directories:
   buildResources: 'build'
   output: 'dist'
+
+publish:
+  provider: github
+  owner: Bossbirdyman51
+  repo: KGInfoServs-Launcher

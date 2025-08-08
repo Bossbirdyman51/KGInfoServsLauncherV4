@@ -33,6 +33,6 @@ jobs:
 
       - name: Build
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run dist
+          GH_TOKEN: ${{ secrets.PAT_FOR_RELEASES }}
+        run: npm run dist -- --publish always
         shell: bash
