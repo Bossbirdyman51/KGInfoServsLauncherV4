@@ -102,6 +102,11 @@ function setLaunchEnabled(val){
 // Bind launch button
 document.getElementById('launch_button').addEventListener('click', async e => {
     loggerLanding.info('Launching game..')
+    if(proc != null){
+        loggerLanding.warn('Attempting to launch game while another instance is running.')
+        showLaunchFailure(Lang.queryJS('landing.launch.alreadyRunningTitle'), Lang.queryJS('landing.launch.alreadyRunningText'))
+        return
+    }
     try {
         const server = (await DistroAPI.getDistribution()).getServerById(ConfigManager.getSelectedServer())
         const jExe = ConfigManager.getJavaExecutable(ConfigManager.getSelectedServer())

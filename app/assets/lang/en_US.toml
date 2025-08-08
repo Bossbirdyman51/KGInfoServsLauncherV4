@@ -156,6 +156,8 @@ desc = "Une erreur inconnue s'est produite. Veuillez consulter la console pour p
 pleaseWait = "Merci de patienter..."
 failureTitle = "Erreur lors du lancement"
 failureText = "See console (CTRL + Shift + i) for more details."
+alreadyRunningTitle = "Jeu déjà en cours"
+alreadyRunningText = "Une instance du jeu est déjà en cours d'exécution. Veuillez la fermer avant d'en lancer une nouvelle."
 okay = "Okay"
 
 [js.landing.selectedAccount]
